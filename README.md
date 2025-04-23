@@ -33,6 +33,7 @@ cd pokemon-tcg-price-tracker
 ```
 
 2. Environment Variables
+
 Create a `.env` file in the project root with the following:
 ```env
 DB_HOST=your-db-host
