@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokémon Card Details</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+  <!-- Luxon + Chart.js adapter -->
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.1.0/dist/chartjs-adapter-luxon.min.js"></script>
+</head>
+<body>
+  <h1>Pokémon Card Details</h1>
+  <div class="card-container">
+    <!-- Left: Card image and info -->
+    <div class="card-left">
+      <img id="detailImage" class="card-image" src="" alt="Pokémon Card" />
+      <h2 id="imageTitle" class="card-name"></h2>
+      <p class="card-info">
+        Set: <span id="cardSet" class="card-set"></span><br />
+        Rarity: <span id="cardRarity" class="card-rarity"></span>
+      </p>
+      <button id="backButton" class="action-button">Back to Search Results</button>
+    </div>
+
+    <!-- Right: Pricing and graph -->
+    <div class="card-right">
+      <div id="prices-container">
+        <p id="pokePriceLow" class="prices"></p>
+        <p id="pokePriceMid" class="prices"></p>
+        <p id="pokePriceHigh" class="prices"></p>
+        <p id="pokePriceMarket" class="prices"></p>
+      </div>
+
+      <h2>Price Trend Graph</h2>
+      <div id="graph-container">
+        <canvas id="priceChart" width="400" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Replace this with your backend server URL (e.g., http://<your-ec2-ip>:5000)
+      const BACKEND_BASE_URL = "<INSERT_YOUR_BACKEND_URL_HERE>";
+
+      const params = new URLSearchParams(window.location.search);
+      const cardId = params.get("id");
+      const searchQuery = params.get("search") || "";
+      const currentPage = params.get("page") || 1;
+
+      // Back navigation
+      document.getElementById("backButton").addEventListener("click", () => {
+        if (document.referrer && document.referrer.includes(window.location.origin)) {
+          window.history.back();
+        } else {
+          window.location.href = `/index.html?search=${encodeURIComponent(searchQuery)}&page=${currentPage}`;
+        }
+      });
+
+      // Graph: historical market prices
+      if (cardId) {
+        fetch(`${BACKEND_BASE_URL}/get_graph?id=${cardId}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.dates?.length && data?.prices?.length) {
+              drawGraph(data.dates.map(d => new Date(d)), data.prices.map(p => parseFloat(p)));
+            } else {
+              displayNoDataMessage();
+            }
+          })
+          .catch((err) => {
+            console.error("Error loading graph:", err);
+            displayNoDataMessage();
+          });
+
+        fetch(`${BACKEND_BASE_URL}/get_latest_prices?id=${cardId}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const format = (val) => val && val !== "Not Available" ? `$${val}` : "Not Available";
+            document.getElementById("pokePriceLow").appendChild(createPriceElement("Low Price:", format(data.low)));
+            document.getElementById("pokePriceMid").appendChild(createPriceElement("Mid Price:", format(data.mid)));
+            document.getElementById("pokePriceHigh").appendChild(createPriceElement("High Price:", format(data.high)));
+            document.getElementById("pokePriceMarket").appendChild(createPriceElement("Market Avg Price:", format(data.market)));
+          })
+          .catch((err) => {
+            console.error("Error fetching price data:", err);
+            ["Low", "Mid", "High", "Market Avg"].forEach(label => {
+              document.getElementById(`pokePrice${label.replace(" ", "")}`).appendChild(
+                createPriceElement(`${label} Price:`, "Not Available")
+              );
+            });
+          });
+      }
+
+      // Fill card image/info
+      document.getElementById("detailImage").src = decodeURIComponent(params.get("image") || "placeholder.png");
+      document.getElementById("detailImage").alt = decodeURIComponent(params.get("name"));
+      document.getElementById("imageTitle").textContent = decodeURIComponent(params.get("name"));
+      document.getElementById("cardSet").textContent = decodeURIComponent(params.get("set"));
+      document.getElementById("cardRarity").textContent = decodeURIComponent(params.get("rarity"));
+
+      function createPriceElement(label, value) {
+        const p = document.createElement("p");
+        const labelSpan = document.createElement("span");
+        labelSpan.classList.add("price-label");
+        labelSpan.textContent = label;
+
+        const valueSpan = document.createElement("span");
+        valueSpan.classList.add("price-value");
+        valueSpan.textContent = value;
+
+        p.classList.add("prices");
+        p.appendChild(labelSpan);
+        p.appendChild(valueSpan);
+        return p;
+      }
+
+      function displayNoDataMessage() {
+        document.getElementById("graph-container").innerHTML = "<p>No Pricing Data Available</p>";
+      }
+
+      function drawGraph(dates, prices) {
+        const ctx = document.getElementById("priceChart").getContext("2d");
+        const min = Math.min(...prices);
+        const max = Math.max(...prices);
+        const pad = (max - min) * 0.2 || 1;
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: dates,
+            datasets: [{ label: "Market Price", data: prices, borderColor: "rgb(75, 192, 192)", fill: false }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                type: "time",
+                time: { unit: "day", tooltipFormat: "MM-dd", displayFormats: { day: "MM-dd" } },
+                title: { display: true, text: "Date" }
+              },
+              y: {
+                min: Math.max(0, Math.floor(min - pad)),
+                max: Math.ceil(max + pad),
+                title: { display: true, text: "Price in USD" },
+                ticks: {
+                  callback: (val) => `$${val}`
+                }
+              }
+            },
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: (context) => `${context.dataset.label || ""}: $${context.formattedValue}`
+                }
+              }
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

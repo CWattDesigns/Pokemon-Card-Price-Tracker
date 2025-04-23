@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokémon Card Explorer</title>
+
+  <!-- Optimize external connections -->
+  <link rel="preconnect" href="https://api.pokemontcg.io" />
+  <link rel="preconnect" href="https://images.pokemontcg.io" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Off-screen navigation menu (Hamburger) -->
+  <div class="off-screen-menu">
+    <ul>
+      <li onclick="window.location.href='/index.html'">Home</li>
+      <li onclick="window.location.href='/data-analysis.html'">Data Analysis</li>
+    </ul>
+  </div>
+
+  <!-- Navigation bar with banner -->
+  <nav class="navbar">
+    <img
+      src="images/pokemon_pokeball-wallpaper-1920x1200.jpg"
+      class="banner-image"
+      alt="Pokémon Banner"
+    />
+    <div class="ham-menu" aria-label="Menu" tabindex="0">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+  </nav>
+
+  <!-- Optional header banner -->
+  <header class="banner"></header>
+
+  <!-- Search form for fetching Pokémon cards -->
+  <form id="searchForm" onsubmit="event.preventDefault(); fetchData();">
+    <div class="search-controls">
+      <input
+        type="text"
+        id="pokemonName"
+        class="search-input"
+        placeholder="Enter Pokémon Card Name"
+        aria-label="Search Pokémon card by name"
+      />
+      <input
+        type="text"
+        id="setInput"
+        class="search-input"
+        placeholder="Enter Set Name (Optional)"
+        aria-label="Enter optional set name"
+      />
+      <input
+        type="text"
+        id="rarityInput"
+        class="search-input"
+        placeholder="Enter Rarity (Optional)"
+        aria-label="Enter optional rarity"
+      />
+    </div>
+
+    <div class="fetch-container">
+      <button id="fetchButton" class="action-button" type="submit">
+        Fetch Pokémon
+      </button>
+    </div>
+  </form>
+
+  <!-- Image container for fetched results -->
+  <div id="imgContainer"></div>
+
+  <!-- Pagination controls -->
+  <div id="paginationControls" style="display: none">
+    <button class="action-button" onclick="prevPage()">Previous</button>
+    <button class="action-button" onclick="nextPage()">Next</button>
+  </div>
+
+  <!-- Placeholder for selected card redirect -->
+  <a href="/pokemoninfo.html">
+    <img
+      src=""
+      alt="Pokémon Card"
+      id="PokemonCard"
+      style="display: none"
+    />
+  </a>
+
+  <!-- Main app logic -->
+  <script src="app.js"></script>
+</body>
+</html>

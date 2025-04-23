@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokémon Card Data Analysis</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Data Labels plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  </head>
+  <body>
+    <h1>Pokémon Card Data Analysis</h1>
+
+    <div id="dataAnalysisPage" class="analysis-wrapper">
+      <div class="analysis-row">
+        <div class="analysis-section">
+          <h2>Cards Tracked</h2>
+          <div id="cardVolumeSummary">
+            <p>Loading summary...</p>
+          </div>
+        </div>
+
+        <div class="analysis-section">
+          <h2>Most Expensive Card</h2>
+          <div id="mostExpensiveCard">Loading...</div>
+        </div>
+
+        <div class="analysis-section">
+          <h2>Top 10 Most Volatile Cards</h2>
+          <ul id="volatileList"></ul>
+        </div>
+
+        <div class="analysis-section">
+          <h2>Rarity Price Changes</h2>
+          <ul id="rarityChangeList"></ul>
+        </div>
+      </div>
+
+      <div class="analysis-row">
+        <div
+          class="analysis-section full-width-table"
+          id="topByRarityContainerWrapper"
+        >
+          <h2>Top 10 Most Expensive Cards by Rarity</h2>
+          <div id="topByRarityContainer"></div>
+          <canvas id="rarityScatterChart" width="800" height="400"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script src="data_analysis.js"></script>
+  </body>
+</html>
