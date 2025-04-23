@@ -17,7 +17,6 @@ Features
 
 ---
 
-Tech Stack
 **Frontend**: HTML, CSS, JavaScript, Chart.js, Luxon<br>
 **Backend**: Python (Flask), psycopg2, dotenv<br>
 **Database**: PostgreSQL (hosted on AWS RDS)<br>
