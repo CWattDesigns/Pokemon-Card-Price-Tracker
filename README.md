@@ -74,7 +74,6 @@ Sample Workflow
 
 ---
 
-Contributing
 Contributions are welcome! Open a pull request or issue for feature ideas or bug fixes.
 
 
