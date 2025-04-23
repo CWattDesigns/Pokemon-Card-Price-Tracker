@@ -68,7 +68,7 @@ Sample Workflow
 1. Run `pricing_test_delay.py` to fetch and export card pricing data.
 2. Use `convert_to_CSV.py` to parse and store it in CSV.
 3. Load that data into PostgreSQL manually or use an ETL script.
-4. Start the Flask server (I ran mine in Git Bash) and visit the frontend to:
+4. Start the Flask server and visit the frontend to:
    - Search cards and see prices
    - Click a card to view trend graph
    - Explore insights on the analysis page
